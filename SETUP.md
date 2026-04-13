@@ -69,25 +69,27 @@ Port có phải 27124 không? (Enter = yes, hoặc gõ số port khác)
 
 Lưu vào biến `PORT` (default 27124).
 
-### Step 5: Create .mcp.json (AUTO)
+### Step 5: Register MCP at user scope (AUTO)
 
-Tạo file `<VAULT_PATH>/.mcp.json` với nội dung:
-```json
-{
-  "mcpServers": {
-    "obsidian": {
-      "command": "npx",
-      "args": ["-y", "obsidian-mcp-server"],
-      "env": {
-        "OBSIDIAN_API_KEY": "<API_KEY>",
-        "OBSIDIAN_API_URL": "https://127.0.0.1:<PORT>"
-      }
-    }
-  }
-}
+**Quan trọng:** Đăng ký MCP ở **user scope** để hoạt động từ bất kỳ CWD nào (không phải project scope qua `.mcp.json`).
+
+Chạy lệnh:
+```bash
+claude mcp add-json --scope user obsidian '{"command":"npx","args":["-y","obsidian-mcp-server"],"env":{"OBSIDIAN_API_KEY":"<API_KEY>","OBSIDIAN_BASE_URL":"https://127.0.0.1:<PORT>","OBSIDIAN_VERIFY_SSL":"false"}}'
 ```
 
-Verify `.mcp.json` đã có trong `.gitignore`. Nếu chưa → append vào.
+**Env vars bắt buộc:**
+- `OBSIDIAN_API_KEY` — API key từ plugin
+- `OBSIDIAN_BASE_URL` — URL Obsidian REST API (chú ý: `BASE_URL`, không phải `API_URL`)
+- `OBSIDIAN_VERIFY_SSL=false` — tắt verify SSL do Local REST API dùng self-signed cert
+
+Verify:
+```bash
+claude mcp list
+```
+Expected: `obsidian: ... - ✓ Connected`
+
+Nếu fail → báo user check lại Obsidian đang chạy + plugin enable.
 
 ### Step 6: Update global CLAUDE.md with vault auto-capture (AUTO)
 
@@ -137,12 +139,13 @@ Bất kể CWD nào, Claude tự động ghi nhận context, decisions, session 
 
 ### Step 7: Verify MCP connection (AUTO)
 
-- Thử ping MCP: `curl -k -H "Authorization: Bearer <API_KEY>" https://127.0.0.1:<PORT>/`
-- Expected: HTTP 200 với JSON response từ Obsidian Local REST API
-- Nếu fail (exit code 7 = connection refused):
-  - Báo user: "Obsidian chưa chạy hoặc Local REST API plugin chưa enable. Mở Obsidian và enable plugin rồi thử lại."
-- Nếu 401: "API key sai, check lại trong plugin settings"
-- Nếu 200: Báo success
+- Test REST API trước: `curl -k -H "Authorization: Bearer <API_KEY>" https://127.0.0.1:<PORT>/`
+  - 200 = OK
+  - 000 (exit 7) = Obsidian chưa mở hoặc plugin chưa enable
+  - 401 = API key sai
+- Test MCP server: `claude mcp list`
+  - Expected: `obsidian: ... - ✓ Connected`
+  - Nếu `✗ Failed to connect` → env vars sai, check lại `OBSIDIAN_BASE_URL` (không phải `OBSIDIAN_API_URL`)
 
 ### Step 8: Final summary
 
@@ -151,11 +154,11 @@ Báo user:
 ✓ Setup hoàn tất
 
 Đã làm:
-- Tạo .mcp.json tại <VAULT_PATH>/.mcp.json
+- Register MCP obsidian ở user scope (work từ mọi CWD)
 - Update ~/.claude/CLAUDE.md với auto-capture rules
-- Verify MCP connection
+- Verify MCP connection: ✓ Connected
 
-Bước cuối cùng (MANUAL): Restart Claude Code để rules global được reload.
+Bước cuối cùng (MANUAL): Restart Claude Code để MCP tools + rules global được load.
 
 Sau khi restart, bạn có thể cd vào bất kỳ project nào và chạy `claude` —
 vault sẽ tự động capture context/decisions/sessions.

@@ -94,26 +94,21 @@ cd claude-obsidian
 2. Copy **API Key**
 3. Lưu ý **port** (mặc định `27124` cho HTTPS)
 
-### 4. Cấu hình MCP cho Claude Code
+### 4. Register MCP cho Claude Code (user scope)
 
-Tạo file `.mcp.json` ở root (đã được gitignore để tránh leak key):
+Đăng ký ở **user scope** để MCP hoạt động từ mọi CWD:
 
-```json
-{
-  "mcpServers": {
-    "obsidian": {
-      "command": "npx",
-      "args": ["-y", "obsidian-mcp-server"],
-      "env": {
-        "OBSIDIAN_API_KEY": "<paste-key-o-day>",
-        "OBSIDIAN_API_URL": "https://127.0.0.1:27124"
-      }
-    }
-  }
-}
+```bash
+claude mcp add-json --scope user obsidian '{"command":"npx","args":["-y","obsidian-mcp-server"],"env":{"OBSIDIAN_API_KEY":"<paste-key-o-day>","OBSIDIAN_BASE_URL":"https://127.0.0.1:27124","OBSIDIAN_VERIFY_SSL":"false"}}'
 ```
 
-Restart Claude Code → gõ `/mcp` → thấy `obsidian` là OK.
+**Lưu ý env vars:**
+- `OBSIDIAN_BASE_URL` (không phải `OBSIDIAN_API_URL`)
+- `OBSIDIAN_VERIFY_SSL=false` — tắt verify SSL do plugin dùng self-signed cert
+
+Verify: `claude mcp list` → phải thấy `obsidian: ... ✓ Connected`
+
+Restart Claude Code session để MCP tools load vào context.
 
 ## Cấu trúc
 
@@ -180,10 +175,17 @@ claude
 
 | Lỗi | Fix |
 |-----|-----|
-| `/mcp` không thấy obsidian | Restart Claude Code sau khi sửa `.mcp.json` |
-| Connection refused | Obsidian chưa mở hoặc plugin Local REST API chưa enable |
-| 401 Unauthorized | API key trong `.mcp.json` sai — copy lại từ plugin settings |
-| Port khác 27124 | Sửa `OBSIDIAN_API_URL` trong `.mcp.json` cho khớp |
+| `claude mcp list` báo `✗ Failed to connect` | Check env vars: phải là `OBSIDIAN_BASE_URL` (không `OBSIDIAN_API_URL`), thêm `OBSIDIAN_VERIFY_SSL=false` |
+| `curl` trả về 000 | Obsidian chưa mở hoặc plugin Local REST API chưa enable |
+| `curl` trả về 401 | API key sai — copy lại từ plugin settings |
+| Port khác 27124 | Sửa `OBSIDIAN_BASE_URL` port cho khớp |
+| MCP connect OK nhưng Claude không thấy tools | Restart Claude Code session |
+
+**Re-register MCP sau khi fix:**
+```bash
+claude mcp remove --scope user obsidian
+claude mcp add-json --scope user obsidian '<new-json>'
+```
 
 Chi tiết MCP: xem `docs/mcp-setup-guide.md`.
 

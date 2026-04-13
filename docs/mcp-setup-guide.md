@@ -27,50 +27,48 @@ Open Obsidian → Settings → Community Plugins → Browse:
 After installing Local REST API:
 1. Enable the plugin
 2. Go to plugin settings → copy the **API Key**
-3. Note the port (default: `27123`)
+3. Note the port (default HTTPS: `27124`)
 
-## Step 2: Install MCP Server
+## Step 2: Register MCP Server (user scope)
 
-Option A — **obsidian-mcp-server** (full-featured, recommended):
+**Recommended — user scope** so MCP works from any CWD:
+
 ```bash
-npm install -g @cyanheads/obsidian-mcp-server
+claude mcp add-json --scope user obsidian '{"command":"npx","args":["-y","obsidian-mcp-server"],"env":{"OBSIDIAN_API_KEY":"<your-api-key>","OBSIDIAN_BASE_URL":"https://127.0.0.1:27124","OBSIDIAN_VERIFY_SSL":"false"}}'
 ```
 
-Option B — **mcpvault** (lightweight):
+**Required env vars:**
+| Var | Value | Note |
+|-----|-------|------|
+| `OBSIDIAN_API_KEY` | API key from plugin settings | Required |
+| `OBSIDIAN_BASE_URL` | `https://127.0.0.1:27124` | Must be `BASE_URL`, NOT `API_URL` |
+| `OBSIDIAN_VERIFY_SSL` | `false` | Disable cert verify for self-signed |
+
+**Scope options:**
+- `--scope user` → works from any directory (recommended)
+- `--scope project` → creates `.mcp.json` in CWD, only works when `cd` into that folder
+- `--scope local` → user + directory specific
+
+First-run note: `npx -y obsidian-mcp-server` auto-downloads package (~30s first time).
+
+## Step 3: Verify Connection
+
 ```bash
-npm install -g mcpvault
+claude mcp list
 ```
 
-## Step 3: Configure Claude Code
-
-Add MCP config to `~/.claude/claude.json`:
-
-```json
-{
-  "mcpServers": {
-    "obsidian": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@cyanheads/obsidian-mcp-server"
-      ],
-      "env": {
-        "OBSIDIAN_API_KEY": "<your-api-key-from-step-1>",
-        "OBSIDIAN_API_URL": "https://127.0.0.1:27123"
-      }
-    }
-  }
-}
+Expected output:
+```
+obsidian: npx -y obsidian-mcp-server - ✓ Connected
 ```
 
-Or for project-level config, add to `.claude.json` in project root.
+If `✗ Failed to connect`:
+- Test REST API directly: `curl -k -H "Authorization: Bearer <key>" https://127.0.0.1:27124/`
+- `000` → Obsidian not running or plugin not enabled
+- `401` → Wrong API key
+- `200` → REST API OK but MCP config wrong (check env var names)
 
-## Step 4: Verify Connection
-
-1. Open Obsidian (vault must be open with Local REST API active)
-2. Start Claude Code: `claude`
-3. Check MCP tools available: `/mcp`
-4. Test: ask Claude to "list all notes in the vault"
+Then restart Claude Code session so MCP tools load into context.
 
 ## Available MCP Operations
 
