@@ -149,7 +149,16 @@ Bất kể CWD nào, Claude tự động ghi nhận context, decisions, session 
   - Expected: `obsidian: ... - ✓ Connected`
   - Nếu `✗ Failed to connect` → env vars sai, check lại `OBSIDIAN_BASE_URL` (không phải `OBSIDIAN_API_URL`)
 
-### Step 8: Final summary
+### Step 8: Install slash commands (AUTO)
+
+Tạo 2 slash commands user-scope để trigger vault capture explicitly:
+
+- `~/.claude/commands/vault-init.md` — init project trong vault (user gõ `/vault-init` đầu session)
+- `~/.claude/commands/vault-summary.md` — viết session summary (user gõ `/vault-summary` cuối session)
+
+Template cho `vault-init.md` và `vault-summary.md` xem trong repo `claude-obsidian/docs/slash-commands/` (Claude có thể copy từ đó qua MCP hoặc Write trực tiếp nếu CWD là vault).
+
+### Step 9: Final summary
 
 Báo user:
 ```

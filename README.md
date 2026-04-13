@@ -100,7 +100,23 @@ cd claude-obsidian
 2. Copy **API Key**
 3. Lưu ý **port** (mặc định `27124` cho HTTPS)
 
-### 4. Register MCP cho Claude Code (user scope)
+### 4. Install slash commands
+
+Copy 2 slash commands từ repo vào `~/.claude/commands/`:
+
+```bash
+# Windows (PowerShell)
+Copy-Item docs/slash-commands/vault-init.md $HOME/.claude/commands/
+Copy-Item docs/slash-commands/vault-summary.md $HOME/.claude/commands/
+
+# macOS/Linux
+cp docs/slash-commands/vault-init.md ~/.claude/commands/
+cp docs/slash-commands/vault-summary.md ~/.claude/commands/
+```
+
+Verify: trong Claude Code gõ `/` → phải thấy `vault-init` và `vault-summary` trong dropdown.
+
+### 5. Register MCP cho Claude Code (user scope)
 
 Đăng ký ở **user scope** để MCP hoạt động từ mọi CWD:
 
@@ -135,43 +151,45 @@ Restart Claude Code session để MCP tools load vào context.
 
 ## Cách dùng
 
-### Workflow hằng ngày (zero-friction)
+### Workflow thực tế
 
 ```bash
-# 1. Mở Obsidian (để MCP Local REST API hoạt động)
-# 2. cd vào BẤT KỲ project nào của bạn
+# 1. Mở Obsidian (MCP Local REST API phải chạy)
+# 2. cd vào project của bạn
 cd D:/projects/my-app
 
 # 3. Chạy claude
 claude
-
-# 4. Code / chat bình thường
 ```
 
-**Claude tự động làm những việc sau** (nhờ auto-capture rules trong `~/.claude/CLAUDE.md`):
+**Đầu session — gõ:**
+```
+/vault-init
+```
+→ Claude tạo `projects/my-app/_index.md` trong vault (nếu chưa có), hỏi bạn về tech stack + active focus.
 
-| Khi nào | Claude tự làm |
-|---------|---------------|
-| Session start | Đọc `projects/my-app/_index.md` + 3 session gần nhất + `decisions-log.md` từ vault |
-| Project mới | Tự tạo `projects/my-app/_index.md` nếu chưa có |
-| Ra quyết định kỹ thuật | Append vào `memory/decisions-log.md` |
-| Gặp pattern tái sử dụng | Tạo note trong `wiki/<category>/` |
-| Session end | Viết `memory/sessions/YYYY-MM-DD-<slug>.md` (tasks, decisions, blockers) |
+**Trong lúc làm việc:**
+- Code bình thường
+- Muốn log decision ngay → bảo Claude *"log decision: chọn X vì Y"*
 
-**Project name** = tên folder bạn đang `cd` vào (CWD basename).
+**Cuối session — gõ:**
+```
+/vault-summary
+```
+→ Claude viết `memory/sessions/YYYY-MM-DD-<slug>.md` với tasks, decisions, blockers, next steps. Update `projects/my-app/_index.md` với last active date.
 
-### Bạn KHÔNG cần
+### Vì sao cần slash commands?
 
-- ❌ Update Active Context thủ công
-- ❌ Chạy template thủ công
-- ❌ Ghi decision thủ công
-- ❌ Tạo project folder thủ công
+Claude Code không tự động đọc/ghi vault khi bạn `cd` vào project. **Rules trong CLAUDE.md không đủ để force Claude proactive** — nó chỉ làm khi có instruction rõ ràng.
 
-### Khi nào cần can thiệp thủ công
+Slash commands = **explicit trigger** để vault capture chạy đúng lúc bạn muốn.
 
-- **Tắt auto-capture cho session cụ thể:** nói với Claude *"Đừng log session này"*
-- **Archive project cũ:** đổi `status: active` → `status: archived` trong `projects/<name>/_index.md`
-- **Xem lại history:** mở Obsidian, browse `memory/sessions/` hoặc `memory/decisions-log.md`
+### Alternative: in-vault projects
+
+Nếu project **nhỏ/prototype**, bạn có thể tạo trực tiếp trong `claude-obsidian/projects/my-app/`:
+- Claude dùng `Read`/`Write` trực tiếp (không cần MCP)
+- Vault CLAUDE.md + global rules cùng load
+- Trade-off: vault phình to, nested git nếu cần version control
 
 ### Quy tắc
 
