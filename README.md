@@ -130,24 +130,51 @@ Restart Claude Code → gõ `/mcp` → thấy `obsidian` là OK.
 
 ## Cách dùng
 
-### Trước mỗi session Claude Code
+### Workflow hằng ngày (zero-friction)
 
-1. Mở Obsidian (để Local REST API chạy)
-2. Update `CLAUDE.md` → section **Active Context** (project đang làm, focus, blocker)
-3. Chạy `claude` trong terminal → Claude tự đọc CLAUDE.md + truy cập vault qua MCP
+```bash
+# 1. Mở Obsidian (để MCP Local REST API hoạt động)
+# 2. cd vào BẤT KỲ project nào của bạn
+cd D:/projects/my-app
 
-### Ghi nhận decisions
+# 3. Chạy claude
+claude
 
-- Decision quan trọng → append vào `memory/decisions-log.md` (dùng [[templates/decision-log-entry]])
-- Pattern tái sử dụng → tạo note trong `wiki/` (dùng [[templates/wiki-article]])
-- Project mới → tạo folder `projects/<name>/` + `_index.md` (dùng [[templates/project-index]])
+# 4. Code / chat bình thường
+```
+
+**Claude tự động làm những việc sau** (nhờ auto-capture rules trong `~/.claude/CLAUDE.md`):
+
+| Khi nào | Claude tự làm |
+|---------|---------------|
+| Session start | Đọc `projects/my-app/_index.md` + 3 session gần nhất + `decisions-log.md` từ vault |
+| Project mới | Tự tạo `projects/my-app/_index.md` nếu chưa có |
+| Ra quyết định kỹ thuật | Append vào `memory/decisions-log.md` |
+| Gặp pattern tái sử dụng | Tạo note trong `wiki/<category>/` |
+| Session end | Viết `memory/sessions/YYYY-MM-DD-<slug>.md` (tasks, decisions, blockers) |
+
+**Project name** = tên folder bạn đang `cd` vào (CWD basename).
+
+### Bạn KHÔNG cần
+
+- ❌ Update Active Context thủ công
+- ❌ Chạy template thủ công
+- ❌ Ghi decision thủ công
+- ❌ Tạo project folder thủ công
+
+### Khi nào cần can thiệp thủ công
+
+- **Tắt auto-capture cho session cụ thể:** nói với Claude *"Đừng log session này"*
+- **Archive project cũ:** đổi `status: active` → `status: archived` trong `projects/<name>/_index.md`
+- **Xem lại history:** mở Obsidian, browse `memory/sessions/` hoặc `memory/decisions-log.md`
 
 ### Quy tắc
 
-- File atomic — 1 concept/file, không viết monolith
+- File atomic — 1 concept/file
 - Dùng `[[wiki links]]` thay vì folder hierarchy sâu
 - Frontmatter bắt buộc: `tags`, `status`, `created`
 - **Không** commit secrets — `.mcp.json` đã trong `.gitignore`
+- **Không** xóa decisions cũ — mark `status: deprecated` nếu cần
 
 ## Troubleshooting
 
