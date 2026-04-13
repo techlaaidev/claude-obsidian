@@ -19,6 +19,9 @@ desktop.ini
 credentials.*
 .mcp.json
 
+# Claude Code local state
+.claude/settings.local.json
+
 # User-generated runtime content (local only — auto-captured by Claude)
 # Keep demo projects tracked, ignore everything else under projects/
 projects/*

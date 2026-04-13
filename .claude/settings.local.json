@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(cp \"C:/Users/admin/.claude/commands/vault-init.md\" \"D:/o_E/Desktop/techla-project/claude-obsidian/docs/slash-commands/vault-init.md\")",
-      "Bash(cp \"C:/Users/admin/.claude/commands/vault-summary.md\" \"D:/o_E/Desktop/techla-project/claude-obsidian/docs/slash-commands/vault-summary.md\")"
-    ]
-  }
-}
