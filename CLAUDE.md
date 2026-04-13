@@ -1,46 +1,88 @@
-# CLAUDE.md - TechLa Knowledge Vault
+# CLAUDE.md — TechLa Knowledge Vault
 
-## Purpose
+**Vault purpose:** Persistent memory cho Claude Code. Tự động ghi nhận project context, decisions, session history xuyên suốt các dự án.
 
-Knowledge base + development memory for TechLa projects. This vault serves as persistent context for Claude Code sessions — storing decisions, patterns, project docs, and reusable knowledge.
+---
 
-## Folder Guide
+## MANDATORY Auto-Capture Rules
 
-| Folder | Purpose |
-|--------|---------|
-| `docs/` | Standards, architecture, guides (synced with project docs) |
-| `projects/` | Per-project documentation, design decisions, references |
-| `wiki/` | Reusable knowledge base (concepts, technologies, patterns) |
-| `memory/` | Session logs, decision history, blockers |
-| `templates/` | Obsidian templates for new notes |
-| `raw/` | Unprocessed research notes, dumps |
-| `plans/` | Implementation plans and reports |
+Claude **PHẢI** làm những điều sau **KHÔNG CẦN** user nhắc:
 
-## Rules for Claude Code
+### 1. Session Start (mỗi khi bắt đầu conversation mới)
 
-1. Read `projects/<project>/_index.md` at session start for active context
-2. Check `memory/decisions-log.md` before re-debating resolved decisions
-3. Link to `wiki/` articles when documenting patterns — don't duplicate
-4. Log significant decisions in `memory/decisions-log.md`
-5. Keep files atomic: one concept per file
-6. Use `[[wiki links]]` for cross-referencing
+- Xác định project name từ CWD (folder name)
+- Đọc `projects/<project-name>/_index.md` nếu tồn tại
+- Nếu chưa tồn tại → **tự tạo ngay** dùng cấu trúc trong `templates/project-index.md`
+- Đọc 3 session gần nhất trong `memory/sessions/` để lấy context
+- Đọc `memory/decisions-log.md` để tránh re-debate quyết định cũ
 
-## Conventions
+### 2. Trong khi làm việc (continuous)
 
-- **Links:** `[[folder/filename]]` (Obsidian wikilinks)
-- **Code blocks:** Always include language identifier
-- **Frontmatter:** Use `tags`, `status`, `created`, `updated` fields
-- **Status values:** `draft`, `active`, `deprecated`, `archived`
-- **File naming:** kebab-case with descriptive names
+- **Decision kỹ thuật** (chọn library, pattern, architecture, trade-off) → **append ngay** vào `memory/decisions-log.md` với format:
+  ```markdown
+  ## YYYY-MM-DD — <Title>
+  - **Project:** <project-name>
+  - **Context:** <1 line>
+  - **Choice:** <choice>
+  - **Reason:** <reason>
+  - **Reversible:** Yes/No
+  ```
+- **Pattern tái sử dụng** (code pattern, gotcha, best practice) → tạo file trong `wiki/<category>/<slug>.md`
+- **Project info update** (tech stack, roadmap change, key file) → update `projects/<project-name>/_index.md`
+
+### 3. Session End (khi user nói "xong", "done", "cảm ơn", hoặc kết thúc task lớn)
+
+- **Tự động viết** `memory/sessions/YYYY-MM-DD-<slug>.md` gồm:
+  - Tasks completed
+  - Decisions made (link tới decisions-log entries)
+  - Blockers gặp phải
+  - Next session suggestions
+- **Không cần** hỏi user, cứ viết.
+
+---
+
+## Vault Structure
+
+| Folder | Auto-managed | Mục đích |
+|--------|--------------|----------|
+| `projects/<name>/` | ✅ Claude tự tạo/update | Per-project context + decisions |
+| `memory/decisions-log.md` | ✅ Claude tự append | Master decision history |
+| `memory/sessions/` | ✅ Claude tự tạo | Daily session logs |
+| `wiki/` | ✅ Claude tự tạo khi gặp pattern mới | Reusable knowledge |
+| `docs/` | ❌ User own | Standards, guides |
+| `templates/` | ❌ Static | Templates reference |
+| `plans/` | ✅ Claude tạo via /ck:cook | Implementation plans |
+
+---
+
+## Behavioral Rules
+
+1. **Never ask permission** trước khi auto-capture — cứ làm
+2. **Never duplicate** decisions — check log trước khi append
+3. **Never write secrets** vào vault (API keys, passwords, tokens)
+4. **Always use `[[wiki links]]`** khi reference nội dung khác trong vault
+5. **Always include frontmatter** khi tạo file mới: `tags`, `status`, `created`, `project`
+6. **Project detection:** CWD folder name = project name. Ví dụ CWD `D:/projects/techla-web` → project `techla-web`
+
+---
+
+## User Workflow (dead simple)
+
+```
+1. Mở Obsidian (để MCP chạy)
+2. cd vào project folder bất kỳ
+3. Chạy `claude`
+4. Code bình thường
+→ Vault tự động update trong suốt quá trình
+```
+
+Không cần update Active Context thủ công. Không cần chạy template. Không cần ghi decision thủ công.
+
+---
 
 ## DO NOT
 
-- Store API keys, credentials, or secrets in vault
-- Delete old decisions — archive or mark `status: deprecated`
-- Create files without frontmatter tags
-- Leave CLAUDE.md stale — refresh Active Context each session
-
-## Active Context (Update Before Each Session)
-
-- **Current Focus:** Vault setup and configuration
-- **Last Updated:** 2026-04-11
+- Hỏi user "có muốn tôi log không?" — cứ log
+- Tạo file ngoài structure trên
+- Ghi credentials/secrets
+- Xóa decisions cũ (archive bằng `status: deprecated` nếu cần)

@@ -2,26 +2,75 @@
 
 Obsidian vault làm knowledge base cho Claude Code — lưu decisions, docs, wiki, session memory xuyên suốt các dự án.
 
+## Sơ đồ hoạt động
+
+```mermaid
+flowchart TB
+    User([User])
+    CC[Claude Code CLI]
+    MCP[MCP Server<br/>obsidian-mcp-server]
+    REST[Obsidian<br/>Local REST API :27124]
+    Vault[(Obsidian Vault)]
+    CLAUDE[CLAUDE.md<br/>Auto-capture rules]
+
+    subgraph VaultContent[Vault Content]
+        direction LR
+        Projects[projects/<br/>per-project context]
+        Memory[memory/<br/>decisions + sessions]
+        Wiki[wiki/<br/>reusable knowledge]
+        Docs[docs/<br/>standards]
+    end
+
+    User -->|cd project<br/>claude| CC
+    CC -->|load rules| CLAUDE
+    CC <-->|stdio| MCP
+    MCP <-->|HTTPS| REST
+    REST <-->|read/write| Vault
+    Vault --- VaultContent
+
+    CC -.->|1. Read project index<br/>+ recent sessions<br/>+ decisions log| Vault
+    CC -.->|2. Auto-append decisions<br/>+ patterns during work| Vault
+    CC -.->|3. Auto-write session<br/>summary on end| Vault
+
+    style CC fill:#e1f5ff
+    style Vault fill:#fff4e1
+    style CLAUDE fill:#ffe1e1
+    style VaultContent fill:#f0f0f0
+```
+
+**Luồng xử lý:**
+
+1. **Session start** — User `cd` vào project → chạy `claude` → Claude Code load `CLAUDE.md` → qua MCP đọc `projects/<name>/_index.md` + 3 sessions gần nhất + `decisions-log.md`
+2. **Working** — User code/chat bình thường → Claude tự append decisions vào `memory/decisions-log.md`, tự tạo wiki articles khi gặp pattern mới
+3. **Session end** — Claude tự viết `memory/sessions/YYYY-MM-DD-<slug>.md` gồm tasks completed, decisions, blockers
+
 ## Setup
 
-### 1. Cài Obsidian + Plugins
+### 1. Clone repo
 
-1. Tải [Obsidian](https://obsidian.md/download) → Open folder as vault → chọn thư mục này
+```bash
+git clone https://github.com/techlaaidev/claude-obsidian.git
+cd claude-obsidian
+```
+
+### 2. Cài Obsidian + Plugins
+
+1. Tải [Obsidian](https://obsidian.md/download) → Open folder as vault → chọn thư mục vừa clone
 2. Settings → Community Plugins → Turn on → Browse, cài:
    - **Local REST API** (bắt buộc cho MCP)
    - **Dataview** (query frontmatter)
    - **Templater** (template nâng cao)
 3. Enable từng plugin sau khi cài
 
-### 2. Cấu hình Local REST API
+### 3. Cấu hình Local REST API
 
 1. Settings → Local REST API
 2. Copy **API Key**
 3. Lưu ý **port** (mặc định `27124` cho HTTPS)
 
-### 3. Cấu hình MCP cho Claude Code
+### 4. Cấu hình MCP cho Claude Code
 
-File `.mcp.json` đã có sẵn ở root. Paste API key vào:
+Tạo file `.mcp.json` ở root (đã được gitignore để tránh leak key):
 
 ```json
 {
