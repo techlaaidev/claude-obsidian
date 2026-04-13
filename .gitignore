@@ -13,3 +13,4 @@ desktop.ini
 .env
 *.key
 credentials.*
+.mcp.json
