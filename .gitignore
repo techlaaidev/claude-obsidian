@@ -14,3 +14,36 @@ desktop.ini
 *.key
 credentials.*
 .mcp.json
+
+# User-generated runtime content (local only — auto-captured by Claude)
+# Keep demo projects tracked, ignore everything else under projects/
+projects/*
+!projects/demo-*
+
+# Session logs (per-user, local only)
+memory/sessions/
+
+# User's own decision log entries (keep seed file tracked via force-add if needed)
+# Note: memory/decisions-log.md stays tracked as a seed; your additions live locally.
+# If you want full isolation, uncomment the next line:
+# memory/decisions-log.md
+
+# Wiki articles (user-generated knowledge, local only)
+wiki/concepts/*
+wiki/technologies/*
+wiki/patterns/*
+!wiki/**/.gitkeep
+
+# Journal entries (local only)
+docs/journals/
+
+# Plans created during real work (keep vault-setup plan as reference)
+plans/*
+!plans/260411-1435-obsidian-vault-setup/
+!plans/reports/
+plans/reports/*
+!plans/reports/.gitkeep
+
+# Raw notes (local dumps, unprocessed)
+raw/*
+!raw/.gitkeep
