@@ -159,3 +159,20 @@ Restart Claude Code → gõ `/mcp` → thấy `obsidian` là OK.
 | Port khác 27124 | Sửa `OBSIDIAN_API_URL` trong `.mcp.json` cho khớp |
 
 Chi tiết MCP: xem `docs/mcp-setup-guide.md`.
+
+## Contributing & Feedback
+
+Repo public, mọi người có thể:
+
+- **Báo lỗi / đề xuất feature:** tạo issue tại [Issues](https://github.com/techlaaidev/claude-obsidian/issues)
+- **Đóng góp code/docs:** fork repo → tạo branch → submit Pull Request
+- **Hỏi đáp:** mở issue với label `question`
+
+Khi báo lỗi, include:
+- OS + Obsidian version + Claude Code version
+- Bước reproduce
+- Log lỗi (nếu có)
+
+## License
+
+MIT (hoặc chỉ định license phù hợp — cập nhật sau).
