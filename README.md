@@ -44,6 +44,12 @@ flowchart TB
 2. **Working** — User code/chat bình thường → Claude tự append decisions vào `memory/decisions-log.md`, tự tạo wiki articles khi gặp pattern mới
 3. **Session end** — Claude tự viết `memory/sessions/YYYY-MM-DD-<slug>.md` gồm tasks completed, decisions, blockers
 
+## Prerequisites
+
+- **Claude Code CLI** — [install](https://docs.claude.com/claude-code/setup)
+- **Obsidian** — [download](https://obsidian.md/download)
+- **Node.js 18+** — cần cho `npx` chạy `obsidian-mcp-server`
+
 ## Setup
 
 ### Quick setup (recommended)
@@ -58,7 +64,7 @@ Trong Claude Code, gõ: **"Setup vault theo SETUP.md"**
 
 Claude sẽ tự động:
 - Detect vault path
-- Tạo `.mcp.json` sau khi bạn paste API key
+- Register MCP `obsidian` ở **user scope** (work từ mọi CWD)
 - Update `~/.claude/CLAUDE.md` với auto-capture rules
 - Verify MCP connection
 
@@ -113,7 +119,9 @@ Restart Claude Code session để MCP tools load vào context.
 ## Cấu trúc
 
 ```
-├── CLAUDE.md         # System prompt — Claude đọc đầu mỗi session
+├── CLAUDE.md         # System prompt — vault rules (scoped to vault root)
+├── README.md         # File này
+├── SETUP.md          # Claude đọc để tự setup
 ├── docs/             # Standards, architecture, guides
 ├── projects/         # Docs per-project (mỗi dự án 1 folder)
 ├── wiki/             # Knowledge tái sử dụng (concepts, tech, patterns)
@@ -122,6 +130,8 @@ Restart Claude Code session để MCP tools load vào context.
 ├── raw/              # Research notes
 └── plans/            # Implementation plans
 ```
+
+**MCP config** nằm ở `~/.claude.json` (user home, không commit vào repo) — đã register qua `claude mcp add-json --scope user`.
 
 ## Cách dùng
 
@@ -168,7 +178,7 @@ claude
 - File atomic — 1 concept/file
 - Dùng `[[wiki links]]` thay vì folder hierarchy sâu
 - Frontmatter bắt buộc: `tags`, `status`, `created`
-- **Không** commit secrets — `.mcp.json` đã trong `.gitignore`
+- **Không** commit secrets — API keys nằm trong `~/.claude.json` (user scope, ngoài repo)
 - **Không** xóa decisions cũ — mark `status: deprecated` nếu cần
 
 ## Troubleshooting

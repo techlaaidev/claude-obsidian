@@ -43,5 +43,5 @@ Obsidian-based knowledge vault enabling Claude Code to access persistent, struct
 
 - All plaintext Markdown (no proprietary formats)
 - Git-friendly folder structure
-- API key management via `.claude/claude.json` (not committed)
-- Local-only access (port 27123, localhost)
+- API key management via `~/.claude.json` (user scope, not committed)
+- Local-only access (HTTPS port 27124, 127.0.0.1 binding)

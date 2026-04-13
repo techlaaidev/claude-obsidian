@@ -93,8 +93,10 @@ Nếu fail → báo user check lại Obsidian đang chạy + plugin enable.
 
 ### Step 6: Update global CLAUDE.md with vault auto-capture (AUTO)
 
-- Đọc file `~/.claude/CLAUDE.md` (Windows: `C:/Users/<username>/.claude/CLAUDE.md`)
-- Check xem đã có section `## TechLa Knowledge Vault — Auto-Capture` chưa
+- Path cross-platform:
+  - **Windows:** `%USERPROFILE%/.claude/CLAUDE.md` (expand to `C:/Users/<user>/.claude/CLAUDE.md`)
+  - **macOS/Linux:** `~/.claude/CLAUDE.md` (expand to `/home/<user>/.claude/CLAUDE.md`)
+- Đọc file này, check xem đã có section `## TechLa Knowledge Vault — Auto-Capture` chưa
 - Nếu **chưa có** → append nội dung sau (thay `<VAULT_PATH>` bằng path đã detect):
 
 ```markdown
@@ -168,6 +170,7 @@ vault sẽ tự động capture context/decisions/sessions.
 
 ## Unresolved edge cases
 
-- Nếu user dùng macOS/Linux → path `~/.claude/CLAUDE.md` thay vì Windows path
-- Nếu MCP `obsidian-mcp-server` package chưa cài → `npx -y` sẽ auto-install lần đầu chạy (chậm ~30s)
-- Nếu user đã có `.mcp.json` → hỏi overwrite hay merge
+- Nếu MCP `obsidian-mcp-server` package chưa cài → `npx -y` sẽ auto-install lần đầu chạy (chậm ~30s, cần network)
+- Nếu user đã register `obsidian` MCP trước đó → chạy `claude mcp remove --scope user obsidian` trước khi re-register
+- Nếu user dùng port khác 27124 (custom trong plugin settings) → update `OBSIDIAN_BASE_URL`
+- Nếu Claude Code CLI chưa cài → hướng dẫn cài trước khi chạy Step 5
