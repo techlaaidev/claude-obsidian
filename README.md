@@ -46,6 +46,32 @@ flowchart TB
 
 ## Setup
 
+### Quick setup (recommended)
+
+```bash
+git clone https://github.com/techlaaidev/claude-obsidian.git
+cd claude-obsidian
+claude
+```
+
+Trong Claude Code, gõ: **"Setup vault theo SETUP.md"**
+
+Claude sẽ tự động:
+- Detect vault path
+- Tạo `.mcp.json` sau khi bạn paste API key
+- Update `~/.claude/CLAUDE.md` với auto-capture rules
+- Verify MCP connection
+
+Và sẽ hỏi bạn 3 bước manual: cài Obsidian, cài plugins, copy API key.
+
+Chi tiết xem [`SETUP.md`](./SETUP.md).
+
+---
+
+### Manual setup
+
+Nếu bạn muốn làm tay từng bước:
+
 ### 1. Clone repo
 
 ```bash
